@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futbol 1v1 y 2v2 Selecciones - Roles Tácticos Diferenciados</title>
+    <title>Chapas Futebolas</title>
     <style>
         body {
             margin: 0;
@@ -100,184 +100,184 @@
 
         <!-- Menú de Selección -->
         <div id="menu-screen" class="screen">
-            <h2>Configura el Partido (CPUs con Roles Tácticos ⚽)</h2>
+            <h2>Configura el Partido</h2>
             
             <label>Modo de Juego:</label>
             <select id="game-mode-select" onchange="toggleGameMode()">
-                <option value="1v1">1v1 (Tú vs CPU)</option>
-                <option value="2v2">2v2 Co-op (Tú + Amigo vs 2 CPUs)</option>
+                <option value="1v1">1v1</option>
+                <option value="2v2">2v2</option>
             </select>
 
-            <label>Tu Nombre / Nickname (Jugador 1 - WASD):</label>
+            <label>Tu Nombre J1:</label>
             <input type="text" id="player-name-input" value="Leyenda" maxlength="12">
 
-            <label>Tu Dorsal (1 - 99):</label>
+            <label>Dorsal J1:</label>
             <input type="number" id="player-number" min="1" max="99" value="10">
 
             <!-- Opciones exclusivas para 2v2 -->
             <div id="friend-config" class="hidden" style="display:flex; flex-direction:column; align-items:center; width:100%;">
-                <label>Nombre de tu Amigo (Jugador 2 - Flechas):</label>
+                <label>Nombre J2:</label>
                 <input type="text" id="friend-name-input" value="Compi" maxlength="12">
 
-                <label>Dorsal de tu Amigo (1 - 99):</label>
+                <label>Dorsal J2:</label>
                 <input type="number" id="friend-number" min="1" max="99" value="9">
             </div>
 
             <label>Elige tu Selección:</label>
             <select id="player-country-select">
                 <optgroup label="Europa">
-                    <option value="ESP">España 🇪🇸</option>
-                    <option value="FRA">Francia 🇫🇷</option>
-                    <option value="GER">Alemania 🇩🇪</option>
-                    <option value="ENG">Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
-                    <option value="POR">Portugal 🇵🇹</option>
-                    <option value="ITA">Italia 🇮🇹</option>
-                    <option value="NED">Países Bajos 🇳🇱</option>
-                    <option value="BEL">Bélgica 🇧🇪</option>
-                    <option value="CRO">Croacia 🇭🇷</option>
-                    <option value="DEN">Dinamarca 🇩🇰</option>
+                    <option value="ESP">España</option>
+                    <option value="FRA">Francia</option>
+                    <option value="GER">Alemania</option>
+                    <option value="ENG">Inglaterra</option>
+                    <option value="POR">Portugal</option>
+                    <option value="ITA">Italia</option>
+                    <option value="NED">Países Bajos</option>
+                    <option value="BEL">Bélgica</option>
+                    <option value="CRO">Croacia</option>
+                    <option value="DEN">Dinamarca</option>
                 </optgroup>
                 <optgroup label="Sudamérica">
-                    <option value="ARG" selected>Argentina 🇦🇷</option>
-                    <option value="BRA">Brasil 🇧🇷</option>
-                    <option value="COL">Colombia 🇨🇴</option>
-                    <option value="URU">Uruguay 🇺🇾</option>
-                    <option value="ECU">Ecuador 🇪🇨</option>
-                    <option value="CHI">Chile 🇨🇱</option>
-                    <option value="PAR">Paraguay 🇵🇾</option>
-                    <option value="PER">Perú 🇵🇪</option>
-                    <option value="BOL">Bolivia 🇧🇴</option>
-                    <option value="VEN">Venezuela 🇻🇪</option>
+                    <option value="ARG" selected>Argentina</option>
+                    <option value="BRA">Brasil</option>
+                    <option value="COL">Colombia</option>
+                    <option value="URU">Uruguay</option>
+                    <option value="ECU">Ecuador</option>
+                    <option value="CHI">Chile</option>
+                    <option value="PAR">Paraguay</option>
+                    <option value="PER">Perú /option>
+                    <option value="BOL">Bolivia</option>
+                    <option value="VEN">Venezuela</option>
                 </optgroup>
                 <optgroup label="Asia">
-                    <option value="KOR">Corea del Sur 🇰🇷</option>
-                    <option value="JPN">Japón 🇯🇵</option>
-                    <option value="IRN">Irán 🇮🇷</option>
-                    <option value="KSA">Arabia Saudí 🇸🇦</option>
-                    <option value="AUS">Australia 🇦🇺</option>
-                    <option value="QAT">Catar 🇶🇦</option>
-                    <option value="IRQ">Irak 🇮🇶</option>
-                    <option value="UAE">Emiratos Árabes 🇦🇪</option>
-                    <option value="UZB">Uzbekistán 🇺🇿</option>
-                    <option value="CHN">China 🇨🇳</option>
+                    <option value="KOR">Corea del Sur</option>
+                    <option value="JPN">Japón</option>
+                    <option value="IRN">Irán</option>
+                    <option value="KSA">Arabia Saudí</option>
+                    <option value="AUS">Australia</option>
+                    <option value="QAT">Catar</option>
+                    <option value="IRQ">Irak</option>
+                    <option value="UAE">Emiratos Árabes</option>
+                    <option value="UZB">Uzbekistán</option>
+                    <option value="CHN">China</option>
                 </optgroup>
                 <optgroup label="Oceanía">
-                    <option value="NZL">Nueva Zelanda 🇳🇿</option>
-                    <option value="NCL">Nueva Caledonia 🇳🇨</option>
-                    <option value="FJI">Fiyi 🇫🇯</option>
-                    <option value="TAH">Tahití 🇵🇫</option>
-                    <option value="VAN">Vanuatu 🇻🇺</option>
+                    <option value="NZL">Nueva Zelanda</option>
+                    <option value="NCL">Nueva Caledonia</option>
+                    <option value="FJI">Fiyi</option>
+                    <option value="TAH">Tahití</option>
+                    <option value="VAN">Vanuatu</option>
                 </optgroup>
                 <optgroup label="Norteamérica">
-                    <option value="USA">EEUU 🇺🇸</option>
-                    <option value="CAN">Canadá 🇨🇦</option>
-                    <option value="MEX">México 🇲🇽</option>
-                    <option value="PAN">Panamá 🇵🇦</option>
-                    <option value="CRC">Costa Rica 🇨🇷</option>
-                    <option value="HON">Honduras 🇭🇳</option>
-                    <option value="JAM">Jamaica 🇯🇲</option>
-                    <option value="SLV">El Salvador 🇸🇻</option>
-                    <option value="GTM">Guatemala 🇬🇹</option>
-                    <option value="TRI">Trinidad y Tobago 🇹🇹</option>
+                    <option value="USA">EEUU</option>
+                    <option value="CAN">Canadá</option>
+                    <option value="MEX">México</option>
+                    <option value="PAN">Panamá</option>
+                    <option value="CRC">Costa Rica</option>
+                    <option value="HON">Honduras</option>
+                    <option value="JAM">Jamaica</option>
+                    <option value="SLV">El Salvador</option>
+                    <option value="GTM">Guatemala</option>
+                    <option value="TRI">Trinidad y Tobago</option>
                 </optgroup>
                 <optgroup label="África">
-                    <option value="MAR">Marruecos 🇲🇦</option>
-                    <option value="CIV">Costa de Marfil 🇨🇮</option>
-                    <option value="NGA">Nigeria 🇳🇬</option>
-                    <option value="SEN">Senegal 🇸🇳</option>
-                    <option value="CMR">Camerún 🇨🇲</option>
-                    <option value="EGY">Egipto 🇪🇬</option>
-                    <option value="GHA">Ghana 🇬🇭</option>
-                    <option value="ALG">Argelia 🇩🇿</option>
-                    <option value="RSA">Sudáfrica 🇿🇦</option>
-                    <option value="TUN">Túnez 🇹🇳</option>
+                    <option value="MAR">Marruecos</option>
+                    <option value="CIV">Costa de Marfil</option>
+                    <option value="NGA">Nigeria</option>
+                    <option value="SEN">Senegal</option>
+                    <option value="CMR">Camerún</option>
+                    <option value="EGY">Egipto</option>
+                    <option value="GHA">Ghana</option>
+                    <option value="ALG">Argelia</option>
+                    <option value="RSA">Sudáfrica</option>
+                    <option value="TUN">Túnez</option>
                 </optgroup>
             </select>
 
-            <label>Tu Equipación:</label>
+            <label>Equipación:</label>
             <select id="player-kit-select">
-                <option value="1">Primera Equipación (Local)</option>
-                <option value="2">Segunda Equipación (Visitante)</option>
+                <option value="1">Primera Equipación</option>
+                <option value="2">Segunda Equipación</option>
             </select>
 
-            <label>Selección Rival (CPU):</label>
+            <label>Selección CPU:</label>
             <select id="rival-country-select">
                 <optgroup label="Europa">
-                    <option value="ESP">España 🇪🇸</option>
-                    <option value="FRA">Francia 🇫🇷</option>
-                    <option value="GER">Alemania 🇩🇪</option>
-                    <option value="ENG">Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
-                    <option value="POR">Portugal 🇵🇹</option>
-                    <option value="ITA">Italia 🇮🇹</option>
-                    <option value="NED">Países Bajos 🇳🇱</option>
-                    <option value="BEL">Bélgica 🇧🇪</option>
-                    <option value="CRO">Croacia 🇭🇷</option>
-                    <option value="DEN">Dinamarca 🇩🇰</option>
+                    <option value="ESP">España</option>
+                    <option value="FRA">Francia</option>
+                    <option value="GER">Alemania</option>
+                    <option value="ENG">Inglaterra</option>
+                    <option value="POR">Portugal</option>
+                    <option value="ITA">Italia</option>
+                    <option value="NED">Países Bajos</option>
+                    <option value="BEL">Bélgica</option>
+                    <option value="CRO">Croacia</option>
+                    <option value="DEN">Dinamarca</option>
                 </optgroup>
                 <optgroup label="Sudamérica">
-                    <option value="ARG">Argentina 🇦🇷</option>
-                    <option value="BRA" selected>Brasil 🇧🇷</option>
-                    <option value="COL">Colombia 🇨🇴</option>
-                    <option value="URU">Uruguay 🇺🇾</option>
-                    <option value="ECU">Ecuador 🇪🇨</option>
-                    <option value="CHI">Chile 🇨🇱</option>
-                    <option value="PAR">Paraguay 🇵🇾</option>
-                    <option value="PER">Perú 🇵🇪</option>
-                    <option value="BOL">Bolivia 🇧🇴</option>
-                    <option value="VEN">Venezuela 🇻🇪</option>
+                    <option value="ARG">Argentina</option>
+                    <option value="BRA" selected>Brasil</option>
+                    <option value="COL">Colombia</option>
+                    <option value="URU">Uruguay</option>
+                    <option value="ECU">Ecuador</option>
+                    <option value="CHI">Chile </option>
+                    <option value="PAR">Paraguay</option>
+                    <option value="PER">Perú</option>
+                    <option value="BOL">Bolivia</option>
+                    <option value="VEN">Venezuela</option>
                 </optgroup>
                 <optgroup label="Asia">
-                    <option value="KOR">Corea del Sur 🇰🇷</option>
-                    <option value="JPN">Japón 🇯🇵</option>
-                    <option value="IRN">Irán 🇮🇷</option>
-                    <option value="KSA">Arabia Saudí 🇸🇦</option>
-                    <option value="AUS">Australia 🇦🇺</option>
-                    <option value="QAT">Catar 🇶🇦</option>
-                    <option value="IRQ">Irak 🇮🇶</option>
-                    <option value="UAE">Emiratos Árabes 🇦🇪</option>
-                    <option value="UZB">Uzbekistán 🇺🇿</option>
-                    <option value="CHN">China 🇨🇳</option>
+                    <option value="KOR">Corea del Sur</option>
+                    <option value="JPN">Japón</option>
+                    <option value="IRN">Irán</option>
+                    <option value="KSA">Arabia Saudí</option>
+                    <option value="AUS">Australia</option>
+                    <option value="QAT">Catar</option>
+                    <option value="IRQ">Irak</option>
+                    <option value="UAE">Emiratos Árabes</option>
+                    <option value="UZB">Uzbekistán</option>
+                    <option value="CHN">China</option>
                 </optgroup>
                 <optgroup label="Oceanía">
-                    <option value="NZL">Nueva Zelanda 🇳🇿</option>
-                    <option value="NCL">Nueva Caledonia 🇳🇨</option>
-                    <option value="FJI">Fiyi 🇫🇯</option>
-                    <option value="TAH">Tahití 🇵🇫</option>
-                    <option value="VAN">Vanuatu 🇻🇺</option>
+                    <option value="NZL">Nueva Zelanda</option>
+                    <option value="NCL">Nueva Caledonia</option>
+                    <option value="FJI">Fiyi</option>
+                    <option value="TAH">Tahití</option>
+                    <option value="VAN">Vanuatu</option>
                 </optgroup>
                 <optgroup label="Norteamérica">
-                    <option value="USA">EEUU 🇺🇸</option>
-                    <option value="CAN">Canadá 🇨🇦</option>
-                    <option value="MEX">México 🇲🇽</option>
-                    <option value="PAN">Panamá 🇵🇦</option>
-                    <option value="CRC">Costa Rica 🇨🇷</option>
-                    <option value="HON">Honduras 🇭🇳</option>
-                    <option value="JAM">Jamaica 🇯🇲</option>
-                    <option value="SLV">El Salvador 🇸🇻</option>
-                    <option value="GTM">Guatemala 🇬🇹</option>
-                    <option value="TRI">Trinidad y Tobago 🇹🇹</option>
+                    <option value="USA">EEUU</option>
+                    <option value="CAN">Canadá</option>
+                    <option value="MEX">México</option>
+                    <option value="PAN">Panamá</option>
+                    <option value="CRC">Costa Rica</option>
+                    <option value="HON">Honduras</option>
+                    <option value="JAM">Jamaica</option>
+                    <option value="SLV">El Salvador</option>
+                    <option value="GTM">Guatemala</option>
+                    <option value="TRI">Trinidad y Tobago</option>
                 </optgroup>
                 <optgroup label="África">
-                    <option value="MAR">Marruecos 🇲🇦</option>
-                    <option value="CIV">Costa de Marfil 🇨🇮</option>
-                    <option value="NGA">Nigeria 🇳🇬</option>
-                    <option value="SEN">Senegal 🇸🇳</option>
-                    <option value="CMR">Camerún 🇨🇲</option>
-                    <option value="EGY">Egipto 🇪🇬</option>
-                    <option value="GHA">Ghana 🇬🇭</option>
-                    <option value="ALG">Argelia 🇩🇿</option>
-                    <option value="RSA">Sudáfrica 🇿🇦</option>
-                    <option value="TUN">Túnez 🇹🇳</option>
+                    <option value="MAR">Marruecos</option>
+                    <option value="CIV">Costa de Marfil</option>
+                    <option value="NGA">Nigeria</option>
+                    <option value="SEN">Senegal</option>
+                    <option value="CMR">Camerún</option>
+                    <option value="EGY">Egipto</option>
+                    <option value="GHA">Ghana</option>
+                    <option value="ALG">Argelia</option>
+                    <option value="RSA">Sudáfrica</option>
+                    <option value="TUN">Túnez</option>
                 </optgroup>
             </select>
 
-            <label>Equipación Rival (CPU):</label>
+            <label>Equipación CPU:</label>
             <select id="rival-kit-select">
-                <option value="1">Primera Equipación (Local)</option>
-                <option value="2" selected>Segunda Equipación (Visitante)</option>
+                <option value="1">Primera Equipación</option>
+                <option value="2" selected>Segunda Equipación</option>
             </select>
 
-            <button onclick="startGame()">¡Comenzar Partido!</button>
+            <button onclick="startGame()">Comenzar Partido</button>
         </div>
 
         <!-- Pantalla de Final de Partido -->
@@ -354,18 +354,18 @@
 
     const funnyAiNames = [
         "Ansu Fatty", "Roberto Calories", "Kylian Mfrappé", "Delicious Jr", 
-        "Happymealiano Martínez", "Guillermo Anchoa", "Iago Aspitos", "Dayot UpaMcDonalds", 
+        "HappyMealiano Martínez", "Guillermo Anchoa", "Iago Aspitos", "Dayot UpaMcDonalds", 
         "Robin van Pepsi", "Sergio Gramos", "Kevin De Burger", "Harry Cake", 
         "Cristiano Rodando", "Cody Gazpacho"
     ];
 
     let gameMode = '1v1';
-    let playerName = 'Leyenda';
+    let playerName = 'Jugador 1';
     let playerNumber = 10;
-    let friendName = 'Compi';
+    let friendName = 'Jugador 2';
     let friendNumber = 9;
-    let playerCountry = 'ARG';
-    let cpuCountry = 'BRA';
+    let playerCountry = 'ESP';
+    let cpuCountry = 'ARG';
     let playerKit = 1;
     let cpuKit = 2;
     let scorePlayer = 0;
@@ -536,7 +536,7 @@
         let outcomeMsg = "";
 
         if (scorePlayer > scoreCpu) {
-            outcomeMsg = gameMode === '1v1' ? `¡Gran victoria para ${playerName} (${pData.flag})! 🎉` : `¡Gran victoria de ${playerName} y ${friendName} (${pData.flag})! 🎉`;
+            outcomeMsg = gameMode === '1v1' ? `¡Victoria para ${playerName} (${pData.flag})! 🎉` : `¡Victoria de ${playerName} y ${friendName} (${pData.flag})! 🎉`;
         } else if (scorePlayer < scoreCpu) {
             let cpuRivalObj = players.find(p => !p.isUser && !p.isFriend);
             let cpuDisplayName = cpuRivalObj ? cpuRivalObj.name : cData.name;
