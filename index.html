@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol 1v1 y 2v2 Selecciones - Roles Tácticos Diferenciados</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #scoreboard {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        #game-container {
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            border: 4px solid #fff;
+            border-radius: 4px;
+        }
+        canvas {
+            display: block;
+            background: #2e7d32;
+        }
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        .hidden {
+            display: none !important;
+        }
+        select, input, button {
+            padding: 6px 10px;
+            font-size: 12px;
+            margin: 3px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        select, input[type="text"], input[type="number"] {
+            background: white;
+            color: black;
+            width: 240px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        label {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 4px;
+            color: #ddd;
+        }
+        .instructions {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #aaa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="scoreboard">
+        <span id="p1-score">Selección: 0</span> - <span id="cpu-score">Rival: 0</span> | ⏱️ <span id="match-timer">0'</span>
+    </div>
+    
+    <div id="game-container">
+        <canvas id="canvas" width="800" height="500"></canvas>
+
+        <!-- Menú de Selección -->
+        <div id="menu-screen" class="screen">
+            <h2>Configura el Partido (CPUs con Roles Tácticos ⚽)</h2>
+            
+            <label>Modo de Juego:</label>
+            <select id="game-mode-select" onchange="toggleGameMode()">
+                <option value="1v1">1v1 (Tú vs CPU)</option>
+                <option value="2v2">2v2 Co-op (Tú + Amigo vs 2 CPUs)</option>
+            </select>
+
+            <label>Tu Nombre / Nickname (Jugador 1 - WASD):</label>
+            <input type="text" id="player-name-input" value="Leyenda" maxlength="12">
+
+            <label>Tu Dorsal (1 - 99):</label>
+            <input type="number" id="player-number" min="1" max="99" value="10">
+
+            <!-- Opciones exclusivas para 2v2 -->
+            <div id="friend-config" class="hidden" style="display:flex; flex-direction:column; align-items:center; width:100%;">
+                <label>Nombre de tu Amigo (Jugador 2 - Flechas):</label>
+                <input type="text" id="friend-name-input" value="Compi" maxlength="12">
+
+                <label>Dorsal de tu Amigo (1 - 99):</label>
+                <input type="number" id="friend-number" min="1" max="99" value="9">
+            </div>
+
+            <label>Elige tu Selección:</label>
+            <select id="player-country-select">
+                <optgroup label="Europa">
+                    <option value="ESP">España 🇪🇸</option>
+                    <option value="FRA">Francia 🇫🇷</option>
+                    <option value="GER">Alemania 🇩🇪</option>
+                    <option value="ENG">Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
+                    <option value="POR">Portugal 🇵🇹</option>
+                    <option value="ITA">Italia 🇮🇹</option>
+                    <option value="NED">Países Bajos 🇳🇱</option>
+                    <option value="BEL">Bélgica 🇧🇪</option>
+                    <option value="CRO">Croacia 🇭🇷</option>
+                    <option value="DEN">Dinamarca 🇩🇰</option>
+                </optgroup>
+                <optgroup label="Sudamérica">
+                    <option value="ARG" selected>Argentina 🇦🇷</option>
+                    <option value="BRA">Brasil 🇧🇷</option>
+                    <option value="COL">Colombia 🇨🇴</option>
+                    <option value="URU">Uruguay 🇺🇾</option>
+                    <option value="ECU">Ecuador 🇪🇨</option>
+                    <option value="CHI">Chile 🇨🇱</option>
+                    <option value="PAR">Paraguay 🇵🇾</option>
+                    <option value="PER">Perú 🇵🇪</option>
+                    <option value="BOL">Bolivia 🇧🇴</option>
+                    <option value="VEN">Venezuela 🇻🇪</option>
+                </optgroup>
+                <optgroup label="Asia">
+                    <option value="KOR">Corea del Sur 🇰🇷</option>
+                    <option value="JPN">Japón 🇯🇵</option>
+                    <option value="IRN">Irán 🇮🇷</option>
+                    <option value="KSA">Arabia Saudí 🇸🇦</option>
+                    <option value="AUS">Australia 🇦🇺</option>
+                    <option value="QAT">Catar 🇶🇦</option>
+                    <option value="IRQ">Irak 🇮🇶</option>
+                    <option value="UAE">Emiratos Árabes 🇦🇪</option>
+                    <option value="UZB">Uzbekistán 🇺🇿</option>
+                    <option value="CHN">China 🇨🇳</option>
+                </optgroup>
+                <optgroup label="Oceanía">
+                    <option value="NZL">Nueva Zelanda 🇳🇿</option>
+                    <option value="NCL">Nueva Caledonia 🇳🇨</option>
+                    <option value="FJI">Fiyi 🇫🇯</option>
+                    <option value="TAH">Tahití 🇵🇫</option>
+                    <option value="VAN">Vanuatu 🇻🇺</option>
+                </optgroup>
+                <optgroup label="Norteamérica">
+                    <option value="USA">EEUU 🇺🇸</option>
+                    <option value="CAN">Canadá 🇨🇦</option>
+                    <option value="MEX">México 🇲🇽</option>
+                    <option value="PAN">Panamá 🇵🇦</option>
+                    <option value="CRC">Costa Rica 🇨🇷</option>
+                    <option value="HON">Honduras 🇭🇳</option>
+                    <option value="JAM">Jamaica 🇯🇲</option>
+                    <option value="SLV">El Salvador 🇸🇻</option>
+                    <option value="GTM">Guatemala 🇬🇹</option>
+                    <option value="TRI">Trinidad y Tobago 🇹🇹</option>
+                </optgroup>
+                <optgroup label="África">
+                    <option value="MAR">Marruecos 🇲🇦</option>
+                    <option value="CIV">Costa de Marfil 🇨🇮</option>
+                    <option value="NGA">Nigeria 🇳🇬</option>
+                    <option value="SEN">Senegal 🇸🇳</option>
+                    <option value="CMR">Camerún 🇨🇲</option>
+                    <option value="EGY">Egipto 🇪🇬</option>
+                    <option value="GHA">Ghana 🇬🇭</option>
+                    <option value="ALG">Argelia 🇩🇿</option>
+                    <option value="RSA">Sudáfrica 🇿🇦</option>
+                    <option value="TUN">Túnez 🇹🇳</option>
+                </optgroup>
+            </select>
+
+            <label>Tu Equipación:</label>
+            <select id="player-kit-select">
+                <option value="1">Primera Equipación (Local)</option>
+                <option value="2">Segunda Equipación (Visitante)</option>
+            </select>
+
+            <label>Selección Rival (CPU):</label>
+            <select id="rival-country-select">
+                <optgroup label="Europa">
+                    <option value="ESP">España 🇪🇸</option>
+                    <option value="FRA">Francia 🇫🇷</option>
+                    <option value="GER">Alemania 🇩🇪</option>
+                    <option value="ENG">Inglaterra 🏴󠁧󠁢󠁥󠁮󠁧󠁿</option>
+                    <option value="POR">Portugal 🇵🇹</option>
+                    <option value="ITA">Italia 🇮🇹</option>
+                    <option value="NED">Países Bajos 🇳🇱</option>
+                    <option value="BEL">Bélgica 🇧🇪</option>
+                    <option value="CRO">Croacia 🇭🇷</option>
+                    <option value="DEN">Dinamarca 🇩🇰</option>
+                </optgroup>
+                <optgroup label="Sudamérica">
+                    <option value="ARG">Argentina 🇦🇷</option>
+                    <option value="BRA" selected>Brasil 🇧🇷</option>
+                    <option value="COL">Colombia 🇨🇴</option>
+                    <option value="URU">Uruguay 🇺🇾</option>
+                    <option value="ECU">Ecuador 🇪🇨</option>
+                    <option value="CHI">Chile 🇨🇱</option>
+                    <option value="PAR">Paraguay 🇵🇾</option>
+                    <option value="PER">Perú 🇵🇪</option>
+                    <option value="BOL">Bolivia 🇧🇴</option>
+                    <option value="VEN">Venezuela 🇻🇪</option>
+                </optgroup>
+                <optgroup label="Asia">
+                    <option value="KOR">Corea del Sur 🇰🇷</option>
+                    <option value="JPN">Japón 🇯🇵</option>
+                    <option value="IRN">Irán 🇮🇷</option>
+                    <option value="KSA">Arabia Saudí 🇸🇦</option>
+                    <option value="AUS">Australia 🇦🇺</option>
+                    <option value="QAT">Catar 🇶🇦</option>
+                    <option value="IRQ">Irak 🇮🇶</option>
+                    <option value="UAE">Emiratos Árabes 🇦🇪</option>
+                    <option value="UZB">Uzbekistán 🇺🇿</option>
+                    <option value="CHN">China 🇨🇳</option>
+                </optgroup>
+                <optgroup label="Oceanía">
+                    <option value="NZL">Nueva Zelanda 🇳🇿</option>
+                    <option value="NCL">Nueva Caledonia 🇳🇨</option>
+                    <option value="FJI">Fiyi 🇫🇯</option>
+                    <option value="TAH">Tahití 🇵🇫</option>
+                    <option value="VAN">Vanuatu 🇻🇺</option>
+                </optgroup>
+                <optgroup label="Norteamérica">
+                    <option value="USA">EEUU 🇺🇸</option>
+                    <option value="CAN">Canadá 🇨🇦</option>
+                    <option value="MEX">México 🇲🇽</option>
+                    <option value="PAN">Panamá 🇵🇦</option>
+                    <option value="CRC">Costa Rica 🇨🇷</option>
+                    <option value="HON">Honduras 🇭🇳</option>
+                    <option value="JAM">Jamaica 🇯🇲</option>
+                    <option value="SLV">El Salvador 🇸🇻</option>
+                    <option value="GTM">Guatemala 🇬🇹</option>
+                    <option value="TRI">Trinidad y Tobago 🇹🇹</option>
+                </optgroup>
+                <optgroup label="África">
+                    <option value="MAR">Marruecos 🇲🇦</option>
+                    <option value="CIV">Costa de Marfil 🇨🇮</option>
+                    <option value="NGA">Nigeria 🇳🇬</option>
+                    <option value="SEN">Senegal 🇸🇳</option>
+                    <option value="CMR">Camerún 🇨🇲</option>
+                    <option value="EGY">Egipto 🇪🇬</option>
+                    <option value="GHA">Ghana 🇬🇭</option>
+                    <option value="ALG">Argelia 🇩🇿</option>
+                    <option value="RSA">Sudáfrica 🇿🇦</option>
+                    <option value="TUN">Túnez 🇹🇳</option>
+                </optgroup>
+            </select>
+
+            <label>Equipación Rival (CPU):</label>
+            <select id="rival-kit-select">
+                <option value="1">Primera Equipación (Local)</option>
+                <option value="2" selected>Segunda Equipación (Visitante)</option>
+            </select>
+
+            <button onclick="startGame()">¡Comenzar Partido!</button>
+        </div>
+
+        <!-- Pantalla de Final de Partido -->
+        <div id="gameover-screen" class="screen hidden">
+            <h2 style="font-size: 26px; color: #FFEB3B; margin-bottom: 5px;">¡Fin del Partido! ⏱️</h2>
+            <p id="gameover-result" style="font-size: 18px; margin: 15px 0; line-height: 1.5;"></p>
+            <button onclick="returnToMenu()">Jugar Otro Partido</button>
+        </div>
+    </div>
+
+    <div id="instructions-text" class="instructions">Usa <b>WASD</b> para moverte y la barra <b>Espacio</b> para chutar. Pulsa <b>G</b> para reiniciar posiciones (pausa) y <b>H</b> para reanudar.</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const countries = {
+        'ESP': { name: 'España', flag: '🇪🇸', kit1: { color: '#aa151b', secondary: '#f1bf00' }, kit2: { color: '#ffffff', secondary: '#002b7f' } },
+        'FRA': { name: 'Francia', flag: '🇫🇷', kit1: { color: '#002395', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#002395' } },
+        'GER': { name: 'Alemania', flag: '🇩🇪', kit1: { color: '#ffffff', secondary: '#000000' }, kit2: { color: '#222222', secondary: '#ffffff' } },
+        'ENG': { name: 'Inglaterra', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', kit1: { color: '#ffffff', secondary: '#ce1126' }, kit2: { color: '#ce1126', secondary: '#ffffff' } },
+        'POR': { name: 'Portugal', flag: '🇵🇹', kit1: { color: '#ff0000', secondary: '#006600' }, kit2: { color: '#ffffff', secondary: '#ff0000' } },
+        'ITA': { name: 'Italia', flag: '🇮🇹', kit1: { color: '#006699', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#006699' } },
+        'NED': { name: 'Países Bajos', flag: '🇳🇱', kit1: { color: '#ff6600', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#212121' } },
+        'BEL': { name: 'Bélgica', flag: '🇧🇪', kit1: { color: '#cc0000', secondary: '#ffd700' }, kit2: { color: '#212121', secondary: '#cc0000' } },
+        'CRO': { name: 'Croacia', flag: '🇭🇷', kit1: { color: '#ff0000', secondary: '#ffffff' }, kit2: { color: '#000080', secondary: '#ffffff' } },
+        'DEN': { name: 'Dinamarca', flag: '🇩🇰', kit1: { color: '#c60c30', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#c60c30' } },
+        'ARG': { name: 'Argentina', flag: '🇦🇷', kit1: { color: '#75aadb', secondary: '#ffffff' }, kit2: { color: '#1a1a1a', secondary: '#75aadb' } },
+        'BRA': { name: 'Brasil', flag: '🇧🇷', kit1: { color: '#ffcc00', secondary: '#009b3a' }, kit2: { color: '#003893', secondary: '#ffffff' } },
+        'COL': { name: 'Colombia', flag: '🇨🇴', kit1: { color: '#fcd116', secondary: '#003893' }, kit2: { color: '#003893', secondary: '#fcd116' } },
+        'URU': { name: 'Uruguay', flag: '🇺🇾', kit1: { color: '#0038b8', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#0038b8' } },
+        'ECU': { name: 'Ecuador', flag: '🇪🇨', kit1: { color: '#ffdd00', secondary: '#002b49' }, kit2: { color: '#002b49', secondary: '#ffdd00' } },
+        'CHI': { name: 'Chile', flag: '🇨🇱', kit1: { color: '#0033a0', secondary: '#da291c' }, kit2: { color: '#ffffff', secondary: '#0033a0' } },
+        'PAR': { name: 'Paraguay', flag: '🇵🇾', kit1: { color: '#d52b1e', secondary: '#0038a8' }, kit2: { color: '#ffffff', secondary: '#d52b1e' } },
+        'PER': { name: 'Perú', flag: '🇵🇪', kit1: { color: '#d91023', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#d91023' } },
+        'BOL': { name: 'Bolivia', flag: '🇧🇴', kit1: { color: '#007934', secondary: '#f4e500' }, kit2: { color: '#ffffff', secondary: '#007934' } },
+        'VEN': { name: 'Venezuela', flag: '🇻🇪', kit1: { color: '#8b0000', secondary: '#ffd700' }, kit2: { color: '#ffffff', secondary: '#8b0000' } },
+        'KOR': { name: 'Corea del Sur', flag: '🇰🇷', kit1: { color: '#c60c30', secondary: '#003478' }, kit2: { color: '#ffffff', secondary: '#000000' } },
+        'JPN': { name: 'Japón', flag: '🇯🇵', kit1: { color: '#002b7f', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#bc002d' } },
+        'IRN': { name: 'Irán', flag: '🇮🇷', kit1: { color: '#ffffff', secondary: '#da0000' }, kit2: { color: '#da0000', secondary: '#239f40' } },
+        'KSA': { name: 'Arabia Saudí', flag: '🇸🇦', kit1: { color: '#006c35', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#006c35' } },
+        'AUS': { name: 'Australia', flag: '🇦🇺', kit1: { color: '#000066', secondary: '#ffcc00' }, kit2: { color: '#ffcc00', secondary: '#000066' } },
+        'QAT': { name: 'Catar', flag: '🇶🇦', kit1: { color: '#8a1538', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#8a1538' } },
+        'IRQ': { name: 'Irak', flag: '🇮🇶', kit1: { color: '#007a3d', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#000000' } },
+        'UAE': { name: 'Emiratos Árabes', flag: '🇦🇪', kit1: { color: '#00732f', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#000000' } },
+        'UZB': { name: 'Uzbekistán', flag: '🇺🇿', kit1: { color: '#0099ff', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#0099ff' } },
+        'CHN': { name: 'China', flag: '🇨🇳', kit1: { color: '#de2910', secondary: '#ffde00' }, kit2: { color: '#ffffff', secondary: '#de2910' } },
+        'NZL': { name: 'Nueva Zelanda', flag: '🇳🇿', kit1: { color: '#111111', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#111111' } },
+        'NCL': { name: 'Nueva Caledonia', flag: '🇳🇨', kit1: { color: '#d21034', secondary: '#002b7f' }, kit2: { color: '#ffffff', secondary: '#d21034' } },
+        'FJI': { name: 'Fiyi', flag: '🇫🇯', kit1: { color: '#ffffff', secondary: '#00539f' }, kit2: { color: '#00539f', secondary: '#ffffff' } },
+        'TAH': { name: 'Tahití', flag: '🇵🇫', kit1: { color: '#ed1c24', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#ed1c24' } },
+        'VAN': { name: 'Vanuatu', flag: '🇻🇺', kit1: { color: '#d21034', secondary: '#009b3a' }, kit2: { color: '#fcd116', secondary: '#000000' } },
+        'USA': { name: 'EEUU', flag: '🇺🇸', kit1: { color: '#ffffff', secondary: '#3c3b6e' }, kit2: { color: '#3c3b6e', secondary: '#b22234' } },
+        'CAN': { name: 'Canadá', flag: '🇨🇦', kit1: { color: '#ff0000', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#ff0000' } },
+        'MEX': { name: 'México', flag: '🇲🇽', kit1: { color: '#006341', secondary: '#ffffff' }, kit2: { color: '#111111', secondary: '#ce1126' } },
+        'PAN': { name: 'Panamá', flag: '🇵🇦', kit1: { color: '#da121a', secondary: '#005293' }, kit2: { color: '#ffffff', secondary: '#da121a' } },
+        'CRC': { name: 'Costa Rica', flag: '🇨🇷', kit1: { color: '#ce1126', secondary: '#002b7f' }, kit2: { color: '#ffffff', secondary: '#ce1126' } },
+        'HON': { name: 'Honduras', flag: '🇭🇳', kit1: { color: '#0073cf', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#0073cf' } },
+        'JAM': { name: 'Jamaica', flag: '🇯🇲', kit1: { color: '#000000', secondary: '#fcd116' }, kit2: { color: '#009b3a', secondary: '#fcd116' } },
+        'SLV': { name: 'El Salvador', flag: '🇸🇻', kit1: { color: '#002b7f', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#002b7f' } },
+        'GTM': { name: 'Guatemala', flag: '🇬🇹', kit1: { color: '#41b6e6', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#41b6e6' } },
+        'TRI': { name: 'Trinidad y Tobago', flag: '🇹🇹', kit1: { color: '#ce1126', secondary: '#ffffff' }, kit2: { color: '#000000', secondary: '#ffffff' } },
+        'MAR': { name: 'Marruecos', flag: '🇲🇦', kit1: { color: '#c1272d', secondary: '#006233' }, kit2: { color: '#ffffff', secondary: '#c1272d' } },
+        'CIV': { name: 'Costa de Marfil', flag: '🇨🇮', kit1: { color: '#ff8200', secondary: '#ffffff' }, kit2: { color: '#009e60', secondary: '#ff8200' } },
+        'NGA': { name: 'Nigeria', flag: '🇳🇬', kit1: { color: '#008751', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#008751' } },
+        'SEN': { name: 'Senegal', flag: '🇸🇳', kit1: { color: '#00853f', secondary: '#fdef42' }, kit2: { color: '#ffffff', secondary: '#00853f' } },
+        'CMR': { name: 'Camerún', flag: '🇨🇲', kit1: { color: '#007a5e', secondary: '#ce1126' }, kit2: { color: '#fdef42', secondary: '#007a5e' } },
+        'EGY': { name: 'Egipto', flag: '🇪🇬', kit1: { color: '#ce1126', secondary: '#ffffff' }, kit2: { color: '#000000', secondary: '#ffffff' } },
+        'GHA': { name: 'Ghana', flag: '🇬🇭', kit1: { color: '#ffffff', secondary: '#006b3f' }, kit2: { color: '#ce1126', secondary: '#fcd116' } },
+        'ALG': { name: 'Argelia', flag: '🇩🇿', kit1: { color: '#006233', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#006233' } },
+        'RSA': { name: 'Sudáfrica', flag: '🇿🇦', kit1: { color: '#ffb612', secondary: '#007749' }, kit2: { color: '#007749', secondary: '#ffffff' } },
+        'TUN': { name: 'Túnez', flag: '🇹🇳', kit1: { color: '#e70013', secondary: '#ffffff' }, kit2: { color: '#ffffff', secondary: '#e70013' } }
+    };
+
+    const funnyAiNames = [
+        "Ansu Fatty", "Roberto Calories", "Kylian Mfrappé", "Delicious Jr", 
+        "Happymealiano Martínez", "Guillermo Anchoa", "Iago Aspitos", "Dayot UpaMcDonalds", 
+        "Robin van Pepsi", "Sergio Gramos", "Kevin De Burger", "Harry Cake", 
+        "Cristiano Rodando", "Cody Gazpacho"
+    ];
+
+    let gameMode = '1v1';
+    let playerName = 'Leyenda';
+    let playerNumber = 10;
+    let friendName = 'Compi';
+    let friendNumber = 9;
+    let playerCountry = 'ARG';
+    let cpuCountry = 'BRA';
+    let playerKit = 1;
+    let cpuKit = 2;
+    let scorePlayer = 0;
+    let scoreCpu = 0;
+
+    let matchTime = 0;
+    let matchTargetMinute = 90;
+    let gameActive = false;
+    let isManuallyPaused = false;
+    let ballInPlay = false;
+    let kickoffTeam = 'player';
+
+    const field = { width: 800, height: 500 };
+    const goalHeight = 160;
+
+    let ball = { x: field.width / 2, y: field.height / 2, vx: 0, vy: 0, radius: 9, friction: 0.98 };
+
+    let players = [];
+    let keys = {};
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === " ") e.preventDefault();
+        keys[e.key] = true;
+
+        if (e.key === 'g' || e.key === 'G') {
+            if (gameActive) {
+                resetPositions();
+                isManuallyPaused = true;
+                updateTimerDisplay();
+            }
+        }
+        if (e.key === 'h' || e.key === 'H') {
+            if (gameActive) {
+                isManuallyPaused = false;
+            }
+        }
+    });
+    window.addEventListener('keyup', (e) => keys[e.key] = false);
+
+    function toggleGameMode() {
+        gameMode = document.getElementById('game-mode-select').value;
+        const friendConfig = document.getElementById('friend-config');
+        const instructions = document.getElementById('instructions-text');
+
+        if (gameMode === '2v2') {
+            friendConfig.classList.remove('hidden');
+            instructions.innerHTML = 'Jugador 1: <b>WASD</b> + <b>Espacio</b> (Chutar) | Amigo (Jugador 2): <b>Flechas</b> + <b>Shift</b> (Chutar)<br><b>G</b>: Reiniciar (Pausa) | <b>H</b>: Reanudar';
+        } else {
+            friendConfig.classList.add('hidden');
+            instructions.innerHTML = 'Usa <b>WASD</b> para moverte y la barra <b>Espacio</b> para chutar. Pulsa <b>G</b> para reiniciar posiciones (pausa) y <b>H</b> para reanudar.';
+        }
+    }
+
+    function startGame() {
+        gameMode = document.getElementById('game-mode-select').value;
+        playerName = document.getElementById('player-name-input').value.trim() || 'Leyenda';
+        playerNumber = Math.max(1, Math.min(99, parseInt(document.getElementById('player-number').value) || 10));
+        
+        if (gameMode === '2v2') {
+            friendName = document.getElementById('friend-name-input').value.trim() || 'Compi';
+            friendNumber = Math.max(1, Math.min(99, parseInt(document.getElementById('friend-number').value) || 9));
+        }
+
+        playerCountry = document.getElementById('player-country-select').value;
+        cpuCountry = document.getElementById('rival-country-select').value;
+        playerKit = parseInt(document.getElementById('player-kit-select').value);
+        cpuKit = parseInt(document.getElementById('rival-kit-select').value);
+
+        matchTime = 0;
+        matchTargetMinute = Math.floor(Math.random() * 6) + 90;
+        gameActive = true;
+        isManuallyPaused = false;
+        kickoffTeam = 'player';
+
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('gameover-screen').classList.add('hidden');
+        
+        initTeams();
+        loop();
+    }
+
+    function getRandomAiNames(count) {
+        let shuffled = [...funnyAiNames].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
+    function initTeams() {
+        scorePlayer = 0;
+        scoreCpu = 0;
+
+        let aiNames = getRandomAiNames(gameMode === '1v1' ? 1 : 2);
+
+        if (gameMode === '1v1') {
+            let cpuRandomNumber = Math.floor(Math.random() * 29) + 2;
+
+            players = [
+                { x: 280, y: 250, vx: 0, vy: 0, radius: 20, team: 'player', countryKey: playerCountry, isUser: true, isFriend: false, name: playerName, number: playerNumber, kit: playerKit },
+                { x: 520, y: 250, vx: 0, vy: 0, radius: 20, team: 'cpu', countryKey: cpuCountry, isUser: false, isFriend: false, name: aiNames[0], number: cpuRandomNumber, kit: cpuKit }
+            ];
+        } else {
+            let cpu1Num = Math.floor(Math.random() * 29) + 2;
+            let cpu2Num = Math.floor(Math.random() * 29) + 2;
+
+            players = [
+                { x: 280, y: 180, vx: 0, vy: 0, radius: 19, team: 'player', countryKey: playerCountry, isUser: true, isFriend: false, name: playerName, number: playerNumber, kit: playerKit },
+                { x: 280, y: 320, vx: 0, vy: 0, radius: 19, team: 'player', countryKey: playerCountry, isUser: false, isFriend: true, name: friendName, number: friendNumber, kit: playerKit },
+                { x: 520, y: 180, vx: 0, vy: 0, radius: 19, team: 'cpu', countryKey: cpuCountry, isUser: false, isFriend: false, name: aiNames[0], number: cpu1Num, kit: cpuKit },
+                { x: 520, y: 320, vx: 0, vy: 0, radius: 19, team: 'cpu', countryKey: cpuCountry, isUser: false, isFriend: false, name: aiNames[1], number: cpu2Num, kit: cpuKit }
+            ];
+        }
+
+        resetPositions();
+        updateScoreboard();
+    }
+
+    function resetPositions() {
+        ball.x = field.width / 2;
+        ball.y = field.height / 2;
+        ball.vx = 0;
+        ball.vy = 0;
+        ballInPlay = false;
+
+        if (gameMode === '1v1') {
+            if (players[0]) { players[0].x = 300; players[0].y = field.height / 2; }
+            if (players[1]) { players[1].x = 500; players[1].y = field.height / 2; }
+        } else {
+            if (players[0]) { players[0].x = 280; players[0].y = field.height / 2 - 70; }
+            if (players[1]) { players[1].x = 280; players[1].y = field.height / 2 + 70; }
+            if (players[2]) { players[2].x = 520; players[2].y = field.height / 2 - 70; }
+            if (players[3]) { players[3].x = 520; players[3].y = field.height / 2 + 70; }
+        }
+    }
+
+    function updateScoreboard() {
+        let pData = countries[playerCountry];
+        let cData = countries[cpuCountry];
+        if (gameMode === '1v1') {
+            document.getElementById('p1-score').innerText = `${playerName} (${pData.flag}): ${scorePlayer}`;
+            let cpuRivalObj = players.find(p => !p.isUser && !p.isFriend);
+            let cpuDisplayName = cpuRivalObj ? cpuRivalObj.name : cData.name;
+            document.getElementById('cpu-score').innerText = `${cpuDisplayName} ${cData.flag}: ${scoreCpu}`;
+        } else {
+            document.getElementById('p1-score').innerText = `${playerName} & ${friendName} (${pData.flag}): ${scorePlayer}`;
+            document.getElementById('cpu-score').innerText = `CPUs (${cData.flag}): ${scoreCpu}`;
+        }
+        updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+        let currentMin = Math.floor(matchTime);
+        let timerText = currentMin + "'";
+        if (currentMin > 90) {
+            timerText = `90'+${currentMin - 90}'`;
+        }
+        if (isManuallyPaused) {
+            timerText += " (PAUSA)";
+        } else if (!ballInPlay) {
+            let sacador = kickoffTeam === 'player' ? 'SAQUE TUYO' : 'SAQUE CPU';
+            timerText += ` (${sacador})`;
+        }
+        document.getElementById('match-timer').innerText = timerText;
+    }
+
+    function endGame() {
+        gameActive = false;
+        let pData = countries[playerCountry];
+        let cData = countries[cpuCountry];
+        let outcomeMsg = "";
+
+        if (scorePlayer > scoreCpu) {
+            outcomeMsg = gameMode === '1v1' ? `¡Gran victoria para ${playerName} (${pData.flag})! 🎉` : `¡Gran victoria de ${playerName} y ${friendName} (${pData.flag})! 🎉`;
+        } else if (scorePlayer < scoreCpu) {
+            let cpuRivalObj = players.find(p => !p.isUser && !p.isFriend);
+            let cpuDisplayName = cpuRivalObj ? cpuRivalObj.name : cData.name;
+            outcomeMsg = `Derrota ante ${cpuDisplayName} ${cData.flag}. 😢`;
+        } else {
+            outcomeMsg = `¡Empate muy disputado! 🤝`;
+        }
+
+        let teamLabel = gameMode === '1v1' ? playerName : `${playerName} & ${friendName}`;
+        document.getElementById('gameover-result').innerHTML = `
+            <b>Resultado Final:</b><br>
+            ${teamLabel} (${pData.flag}) ${scorePlayer} - ${scoreCpu} CPUs (${cData.flag})<br><br>
+            <i>Pitido final al minuto ${Math.floor(matchTime)}'</i><br><br>
+            ${outcomeMsg}
+        `;
+        document.getElementById('gameover-screen').classList.remove('hidden');
+    }
+
+    function returnToMenu() {
+        document.getElementById('gameover-screen').classList.add('hidden');
+        document.getElementById('menu-screen').classList.remove('hidden');
+    }
+
+    function update() {
+        if (!gameActive || isManuallyPaused) return;
+
+        if (ballInPlay) {
+            matchTime += 1 / 45;
+            if (matchTime >= matchTargetMinute) {
+                matchTime = matchTargetMinute;
+                updateTimerDisplay();
+                endGame();
+                return;
+            }
+        }
+        updateTimerDisplay();
+
+        let speed = 3.9;
+
+        // Calcular velocidad y movimiento del Jugador 1
+        let p1 = players.find(p => p.isUser);
+        if (p1) {
+            let m1X = 0, m1Y = 0;
+            if (keys['w'] || keys['W']) m1Y = -speed;
+            if (keys['s'] || keys['S']) m1Y = speed;
+            if (keys['a'] || keys['A']) m1X = -speed;
+            if (keys['d'] || keys['D']) m1X = speed;
+
+            p1.vx = m1X;
+            p1.vy = m1Y;
+            p1.x += p1.vx;
+            p1.y += p1.vy;
+            p1.x = Math.max(p1.radius, Math.min(field.width - p1.radius, p1.x));
+            p1.y = Math.max(p1.radius, Math.min(field.height - p1.radius, p1.y));
+        }
+
+        // Jugador 2 (Amigo) si es 2v2
+        if (gameMode === '2v2') {
+            let p2 = players.find(p => p.isFriend);
+            if (p2) {
+                let m2X = 0, m2Y = 0;
+                if (keys['ArrowUp']) m2Y = -speed;
+                if (keys['ArrowDown']) m2Y = speed;
+                if (keys['ArrowLeft']) m2X = -speed;
+                if (keys['ArrowRight']) m2X = speed;
+
+                p2.vx = m2X;
+                p2.vy = m2Y;
+                p2.x += p2.vx;
+                p2.y += p2.vy;
+                p2.x = Math.max(p2.radius, Math.min(field.width - p2.radius, p2.x));
+                p2.y = Math.max(p2.radius, Math.min(field.height - p2.radius, p2.y));
+            }
+        }
+
+        // --- INTELIGENCIA ARTIFICIAL CON ROLES TÁCTICOS DIFERENCIADOS ---
+        let cpus = players.filter(p => !p.isUser && !p.isFriend);
+        if (!ballInPlay && kickoffTeam === 'cpu') {
+            cpus.forEach((cpu, index) => {
+                let targetX = field.width / 2 + 50;
+                let targetY = field.height / 2 + (index === 0 ? -50 : 50);
+                let dx = targetX - cpu.x;
+                let dy = targetY - cpu.y;
+                let dist = Math.hypot(dx, dy);
+                if (dist > 2) {
+                    cpu.vx = (dx / dist) * 2;
+                    cpu.vy = (dy / dist) * 2;
+                    cpu.x += cpu.vx;
+                    cpu.y += cpu.vy;
+                }
+            });
+        } else if (ballInPlay) {
+            cpus.forEach((cpu, index) => {
+                let targetX, targetY;
+                let aiSpeedModifier = 0.05;
+
+                if (gameMode === '2v2' && cpus.length === 2) {
+                    if (index === 0) {
+                        // CPU 1 (DELANTERO / PRESIONADOR): Va directamente a presionar y buscar la pelota
+                        targetX = ball.x;
+                        targetY = ball.y;
+                        aiSpeedModifier = 0.055;
+                    } else {
+                        // CPU 2 (DEFENSOR / CIERRE TÁCTICO): Juega con criterio propio. 
+                        // Mantiene una posición equilibrada cubriendo la retaguardia o basculando según el balón.
+                        if (ball.x > field.width / 2) {
+                            // Si la pelota está en su campo, hace cobertura defensiva inteligente
+                            targetX = field.width - 200;
+                            targetY = ball.y * 0.6 + (field.height / 2) * 0.4;
+                        } else {
+                            // Si la pelota está en campo contrario, actúa como mediocampista de contención adelantado
+                            targetX = field.width - 320;
+                            targetY = field.height / 2 + (ball.y < field.height / 2 ? 70 : -70);
+                        }
+                        aiSpeedModifier = 0.045;
+                    }
+                } else {
+                    targetX = ball.x;
+                    targetY = ball.y;
+                }
+
+                let nextX = cpu.x + (targetX - cpu.x) * aiSpeedModifier;
+                let nextY = cpu.y + (targetY - cpu.y) * aiSpeedModifier;
+                cpu.vx = nextX - cpu.x;
+                cpu.vy = nextY - cpu.y;
+                cpu.x = nextX;
+                cpu.y = nextY;
+
+                cpu.x = Math.max(cpu.radius, Math.min(field.width - cpu.radius, cpu.x));
+                cpu.y = Math.max(cpu.radius, Math.min(field.height - cpu.radius, cpu.y));
+            });
+        }
+
+        // --- ANTI-TUNNELING ABSOLUTO: SUB-PASOS DE FÍSICA ---
+        let substeps = 8;
+        let subVx = ball.vx / substeps;
+        let subVy = ball.vy / substeps;
+
+        for (let step = 0; step < substeps; step++) {
+            ball.x += subVx;
+            ball.y += subVy;
+
+            // Rebotes en paredes superior e inferior
+            if (ball.y - ball.radius < 0) { ball.y = ball.radius; ball.vy *= -1.0; subVy *= -1.0; }
+            if (ball.y + ball.radius > field.height) { ball.y = field.height - ball.radius; ball.vy *= -1.0; subVy *= -1.0; }
+
+            let inGoalY = ball.y > (field.height / 2 - goalHeight / 2) && ball.y < (field.height / 2 + goalHeight / 2);
+            if (!inGoalY) {
+                if (ball.x - ball.radius < 0) { ball.x = ball.radius; ball.vx *= -1.0; subVx *= -1.0; }
+                if (ball.x + ball.radius > field.width) { ball.x = field.width - ball.radius; ball.vx *= -1.0; subVx *= -1.0; }
+            } else {
+                if (ball.x < 0) {
+                    scoreCpu++;
+                    kickoffTeam = 'player';
+                    updateScoreboard();
+                    resetPositions();
+                    break;
+                } else if (ball.x > field.width) {
+                    scorePlayer++;
+                    kickoffTeam = 'cpu';
+                    updateScoreboard();
+                    resetPositions();
+                    break;
+                }
+            }
+
+            // Colisión rígida garantizada con cada jugador
+            players.forEach(p => {
+                let dx = ball.x - p.x;
+                let dy = ball.y - p.y;
+                let distance = Math.hypot(dx, dy);
+                let minDist = ball.radius + p.radius;
+
+                if (distance < minDist) {
+                    if (p.isUser || p.isFriend) {
+                        ballInPlay = true;
+                    } else if (!p.isUser && !p.isFriend && kickoffTeam === 'cpu') {
+                        ballInPlay = true;
+                    }
+
+                    let angle = Math.atan2(dy, dx);
+                    if (distance === 0) angle = Math.random() * Math.PI * 2;
+
+                    // FUERZA Y SEPARACIÓN ABSOLUTA: Desplaza la pelota por completo fuera del radio del jugador
+                    ball.x = p.x + Math.cos(angle) * minDist;
+                    ball.y = p.y + Math.sin(angle) * minDist;
+
+                    let hitPower = 9.0;
+                    if (p.isUser && keys[' ']) {
+                        hitPower = 16.0;
+                    } else if (p.isFriend && keys['Shift']) {
+                        hitPower = 16.0;
+                    } else if (!p.isUser && !p.isFriend) {
+                        let goalTargetX = 0;
+                        let goalTargetY = field.height / 2 + (Math.random() - 0.5) * 200; 
+                        angle = Math.atan2(goalTargetY - ball.y, goalTargetX - ball.x) + (Math.random() - 0.5) * 0.5;
+                        hitPower = 10.0;
+                    }
+
+                    // Transfiere también parte de la inercia del jugador a la pelota
+                    ball.vx = Math.cos(angle) * hitPower + (p.vx || 0) * 0.6;
+                    ball.vy = Math.sin(angle) * hitPower + (p.vy || 0) * 0.6;
+                    
+                    subVx = ball.vx / substeps;
+                    subVy = ball.vy / substeps;
+                }
+            });
+        }
+
+        // Fricción final
+        ball.vx *= ball.friction;
+        ball.vy *= ball.friction;
+
+        // Colisiones entre jugadores para evitar que se atraviesen entre ellos
+        for (let i = 0; i < players.length; i++) {
+            for (let j = i + 1; j < players.length; j++) {
+                let pA = players[i];
+                let pB = players[j];
+                let dx = pB.x - pA.x;
+                let dy = pB.y - pA.y;
+                let dist = Math.hypot(dx, dy);
+                let minDist = pA.radius + pB.radius;
+                if (dist < minDist && dist > 0) {
+                    let overlap = minDist - dist;
+                    let angle = Math.atan2(dy, dx);
+                    pA.x -= Math.cos(angle) * overlap * 0.5;
+                    pA.y -= Math.sin(angle) * overlap * 0.5;
+                    pB.x += Math.cos(angle) * overlap * 0.5;
+                    pB.y += Math.sin(angle) * overlap * 0.5;
+                }
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, field.width, field.height);
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 4;
+        
+        ctx.beginPath();
+        ctx.moveTo(field.width / 2, 0);
+        ctx.lineTo(field.width / 2, field.height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(field.width / 2, field.height / 2, 60, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.fillRect(0, (field.height - goalHeight) / 2, 20, goalHeight);
+        ctx.fillRect(field.width - 20, (field.height - goalHeight) / 2, 20, goalHeight);
+
+        players.forEach(p => {
+            let cData = countries[p.countryKey];
+            let kitData = cData['kit' + p.kit];
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = kitData.color;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = (p.isUser || p.isFriend) ? '#FFEB3B' : kitData.secondary;
+            ctx.stroke();
+            ctx.closePath();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 11px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(p.name, p.x, p.y - 24);
+
+            ctx.fillStyle = kitData.secondary;
+            ctx.font = "bold 14px Arial";
+            ctx.fillText(p.number, p.x, p.y + 2);
+        });
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "#000";
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    function loop() {
+        update();
+        draw();
+        if (gameActive || document.getElementById('gameover-screen').classList.contains('hidden') === false) {
+            requestAnimationFrame(loop);
+        }
+    }
+</script>
+
+</body>
+</html>
